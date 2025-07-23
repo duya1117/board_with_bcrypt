@@ -1,8 +1,8 @@
 package com.hs.board_with_bcrypt.service;
 
-import com.hs.board_with_bcrypt.dto.PostDeleteRequestDto;
 import com.hs.board_with_bcrypt.dto.PostRequestDto;
 import com.hs.board_with_bcrypt.dto.PostResponseDto;
+import com.hs.board_with_bcrypt.dto.UserRequestDto;
 import com.hs.board_with_bcrypt.model.Post;
 import com.hs.board_with_bcrypt.model.User;
 import com.hs.board_with_bcrypt.repository.PostRepository;
@@ -32,7 +32,8 @@ public class PostService {
 
     public PostResponseDto getById(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 POST를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("해당 Post를 찾을 수 없습니다."));
+
         return PostResponseDto.fromEntity(post);
     }
 
@@ -42,31 +43,31 @@ public class PostService {
         Post post = new Post();
         post.setAuthor(user);
         post.setTitle(dto.getTitle());
-        if (dto.getContent() == null && !dto.getContent().isBlank()) post.setContent((dto.getContent()));
+        if (dto.getContent() != null && !dto.getContent().isBlank()) post.setContent(dto.getContent());
 
         return PostResponseDto.fromEntity(postRepository.save(post));
     }
 
-    public PostResponseDto update(Long id,PostRequestDto dto) {
-        User user = userService.login(dto.getUsername(),dto.getPassword());
-        PostResponseDto post = getById(id);
+    public PostResponseDto update(Long id, PostRequestDto dto) {
+        User user = userService.login(dto.getUsername(), dto.getPassword());
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("해당 Post를 찾을 수 없습니다."));
 
         if(!user.getUsername().equals(post.getAuthor().getUsername())) {
             throw new RuntimeException("다른 유저의 글은 수정할 수 없습니다.");
         }
 
-        Post updatedPost = postRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 POST를 찾을 수 없습니다."));
-        updatedPost.setAuthor(user);
-        updatedPost.setTitle(dto.getTitle());
+        post.setAuthor(user);
+        post.setTitle(dto.getTitle());
         if (dto.getContent() != null && !dto.getContent().isBlank()) post.setContent(dto.getContent());
 
-        return PostResponseDto.fromEntity(postRepository.save(updatedPost));
+        return PostResponseDto.fromEntity(postRepository.save(post));
     }
 
-    public void delete(Long id, PostDeleteRequestDto dto) {
+    public void delete(Long id, UserRequestDto dto) {
         User user = userService.login(dto.getUsername(), dto.getPassword());
-        PostResponseDto post = getById(id);
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("해당 Post를 찾을 수 없습니다."));
 
         if(!user.getUsername().equals(post.getAuthor().getUsername())) {
             throw new RuntimeException("다른 유저의 글은 삭제할 수 없습니다.");

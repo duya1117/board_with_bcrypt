@@ -1,13 +1,11 @@
 package com.hs.board_with_bcrypt.controller;
 
-import com.hs.board_with_bcrypt.dto.PostDeleteRequestDto;
 import com.hs.board_with_bcrypt.dto.PostRequestDto;
 import com.hs.board_with_bcrypt.dto.PostResponseDto;
-import com.hs.board_with_bcrypt.model.Post;
+import com.hs.board_with_bcrypt.dto.UserRequestDto;
 import com.hs.board_with_bcrypt.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -48,7 +46,7 @@ public class PostController {
 
     @DeleteMapping("/{id}")
     public void delete(
-            @PathVariable Long id, @Valid @RequestBody PostDeleteRequestDto dto) {
+            @PathVariable Long id, @Valid @RequestBody UserRequestDto dto) {
         postService.delete(id, dto);
     }
 }
